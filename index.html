@@ -1439,7 +1439,14 @@
                             .order('created_at', { ascending: false });
                         
                         if (error) throw error;
-                        this.books = books || [];
+                        // データベースのスネークケースをキャメルケースに変換
+                        this.books = (books || []).map(book => ({
+                            ...book,
+                            totalPages: book.total_pages,
+                            currentPage: book.current_page,
+                            expectedCompletion: book.expected_completion,
+                            completedDate: book.completed_date
+                        }));
                         
                         // 目標データを取得
                         const { data: goals } = await supabase
@@ -1510,8 +1517,17 @@
                 // 本の追加
                 async addBook() {
                     const newBook = {
-                        ...this.newBook,
+                        title: this.newBook.title,
+                        author: this.newBook.author,
+                        isbn: this.newBook.isbn,
+                        total_pages: this.newBook.totalPages,
+                        current_page: this.newBook.currentPage,
+                        genre: this.newBook.genre,
                         tags: this.newBook.tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag),
+                        status: this.newBook.status,
+                        memo: this.newBook.memo,
+                        favorite: this.newBook.favorite,
+                        rating: this.newBook.rating,
                         progress: this.newBook.status === 'completed' ? 100 : 
                                  this.newBook.status === 'reading' ? Math.round((this.newBook.currentPage / this.newBook.totalPages) * 100) : 0,
                         created_at: new Date(),
@@ -1519,7 +1535,7 @@
                     };
                     
                     if (this.newBook.status === 'reading') {
-                        newBook.expectedCompletion = this.calculateExpectedCompletion(
+                        newBook.expected_completion = this.calculateExpectedCompletion(
                             this.newBook.currentPage,
                             this.newBook.totalPages
                         );
@@ -1533,7 +1549,15 @@
                                 .select();
                             
                             if (error) throw error;
-                            this.books.unshift(data[0]);
+                            // データベースのスネークケースをキャメルケースに変換
+                            const newBookData = {
+                                ...data[0],
+                                totalPages: data[0].total_pages,
+                                currentPage: data[0].current_page,
+                                expectedCompletion: data[0].expected_completion,
+                                completedDate: data[0].completed_date
+                            };
+                            this.books.unshift(newBookData);
                         } catch (error) {
                             console.error('Error adding book:', error);
                         }
@@ -1578,9 +1602,9 @@
                 async saveProgress() {
                     const progress = Math.round((this.updateBook.currentPage / this.updateBook.totalPages) * 100);
                     const updates = {
-                        currentPage: this.updateBook.currentPage,
+                        current_page: this.updateBook.currentPage,
                         progress: progress,
-                        expectedCompletion: this.calculateExpectedCompletion(
+                        expected_completion: this.calculateExpectedCompletion(
                             this.updateBook.currentPage,
                             this.updateBook.totalPages
                         ),
@@ -1589,7 +1613,7 @@
                     
                     if (this.updateBook.currentPage === this.updateBook.totalPages) {
                         updates.status = 'completed';
-                        updates.completedDate = new Date();
+                        updates.completed_date = new Date();
                         updates.rating = this.updateBook.rating || 3;
                     }
                     
