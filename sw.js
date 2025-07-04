@@ -3,9 +3,9 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  // '/icon-192.png', // 存在しない場合はコメントアウト
-  // '/icon-512.png', // 存在しない場合はコメントアウト
-  // '/favicon.ico',   // 存在しない場合はコメントアウト
+  '/icon-192.png',
+  '/icon-512.png',
+  '/favicon.ico',
   'https://unpkg.com/vue@3/dist/vue.global.prod.js', // 本番用Vue
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/chart.js',
