@@ -3,10 +3,10 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/favicon.ico',
-  'https://unpkg.com/vue@3/dist/vue.global.js',
+  // '/icon-192.png', // 存在しない場合はコメントアウト
+  // '/icon-512.png', // 存在しない場合はコメントアウト
+  // '/favicon.ico',   // 存在しない場合はコメントアウト
+  'https://unpkg.com/vue@3/dist/vue.global.prod.js', // 本番用Vue
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js',
@@ -26,22 +26,21 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // キャッシュがあればキャッシュを返す
         if (response) {
           return response;
         }
-        // なければネットワークから取得
         return fetch(event.request).then(response => {
-          // 有効なレスポンスでない場合はそのまま返す
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
-          // レスポンスをクローンしてキャッシュに保存
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
+          // http/https以外はキャッシュしない
+          if (event.request.url.startsWith('http')) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+          }
           return response;
         });
       })
