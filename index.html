@@ -1395,7 +1395,7 @@
                                 if (error) throw error;
                                 this.authError = '確認メールを送信しました。メールを確認してください。';
                             } else {
-                                const { data, error } = await supabase.auth.signIn({
+                                const { data, error } = await supabase.auth.signInWithPassword({
                                     email: this.authEmail,
                                     password: this.authPassword
                                 });
