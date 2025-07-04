@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本の森 - 読書進捗トラッカー | プレミアムデザイン</title>
+    <meta name="description" content="洗練されたデザインと優れたUXを備えた読書管理アプリ。グラデーション、アニメーション、レスポンシブデザインを駆使した高品質なインターフェース。">
+    <meta name="keywords" content="読書記録,読書管理,積読解消,読書習慣,本の管理,読書トラッカー">
+    
+    <!-- OGP設定 -->
+    <meta property="og:title" content="本の森 - 読書進捗トラッカー">
+    <meta property="og:description" content="読みかけの本を管理し、読書ペースを可視化。積読解消をサポート！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://appadaycreator.github.io/book-forest/">
+    <meta property="og:image" content="https://appadaycreator.github.io/book-forest/ogp.png">
+    <meta property="og:site_name" content="本の森">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@appadaycreator">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- PWA設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2d5016">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
+    <!-- End Google Tag Manager -->
+    
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Day.js -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/ja.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2d5016;
+            --secondary-color: #4a7c2e;
+            --accent-color: #8bc34a;
+            --light-green: #dcedc8;
+            --dark-text: #212121;
+            --light-text: #757575;
+            --background: #fafafa;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.5rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--dark-text);
+            line-height: 1.6;
+            font-size: var(--font-size-base);
+        }
+        
+        /* 文字サイズ変更対応 */
+        body.font-xs { --font-size-base: 0.75rem; }
+        body.font-sm { --font-size-base: 0.875rem; }
+        body.font-lg { --font-size-base: 1.125rem; }
+        body.font-xl { --font-size-base: 1.25rem; }
+        
+        /* ヘッダー */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: var(--font-size-xl);
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        /* メインコンテンツ */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* カード */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        /* ボタン */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--light-green);
+            color: var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        /* フォーム要素 */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: var(--font-size-base);
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        /* 進捗バー */
+        .progress-bar {
+            background: var(--border-color);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        /* 本のカード */
+        .book-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .book-card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 8px rgba(139, 195, 74, 0.2);
+        }
+        
+        .book-cover {
+            width: 80px;
+            height: 120px;
+            background: var(--light-green);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .book-info {
+            flex: 1;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            color: var(--dark-text);
+            margin-bottom: 0.25rem;
+        }
+        
+        .book-author {
+            color: var(--light-text);
+            font-size: var(--font-size-sm);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 統計グラフ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--light-green), white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            color: var(--light-text);
+            font-size: var(--font-size-sm);
+        }
+        
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            .nav-menu {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .book-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .book-cover {
+                margin: 0 auto;
+            }
+        }
+        
+        /* ローディング */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* タブ */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            background: var(--light-green);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* フッター */
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem 1rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            line-height: 2;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        /* バッジ */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 12px;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        .badge-gold {
+            background: linear-gradient(135deg, #FFB300, #FFD54F);
+        }
+        
+        .badge-silver {
+            background: linear-gradient(135deg, #757575, #BDBDBD);
+        }
+        
+        .badge-bronze {
+            background: linear-gradient(135deg, #6D4C41, #A1887F);
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <div id="app">
+        <!-- ヘッダー -->
+        <header class="header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        <path d="M12 6l-6 3v6c0 3.33 2.3 6.44 5.4 7.2.4.1.8.1 1.2 0 3.1-.76 5.4-3.87 5.4-7.2V9l-6-3z" fill="rgba(255,255,255,0.3)"/>
+                        <circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.8)"/>
+                    </svg>
+                    本の森
+                </a>
+                
+                <nav>
+                    <ul class="nav-menu">
+                        <li><a href="#" @click="currentView = 'dashboard'">ダッシュボード</a></li>
+                        <li><a href="#" @click="currentView = 'bookshelf'">本棚</a></li>
+                        <li><a href="#" @click="currentView = 'stats'">統計</a></li>
+                        <li><a href="#" @click="currentView = 'goals'">目標</a></li>
+                        <li>
+                            <select v-model="language" @change="changeLanguage" class="form-input" style="width: auto; padding: 0.5rem;">
+                                <option value="ja">日本語</option>
+                                <option value="en">English</option>
+                            </select>
+                        </li>
+                        <li>
+                            <select v-model="fontSize" @change="changeFontSize" class="form-input" style="width: auto; padding: 0.5rem;">
+                                <option value="xs">極小</option>
+                                <option value="sm">小</option>
+                                <option value="base">標準</option>
+                                <option value="lg">大</option>
+                                <option value="xl">特大</option>
+                            </select>
+                        </li>
+                        <li v-if="!user">
+                            <button @click="showLoginModal = true" class="btn btn-secondary">{{ t('login') }}</button>
+                        </li>
+                        <li v-else>
+                            <button @click="logout" class="btn btn-secondary">{{ t('logout') }}</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-container">
+            <!-- 未ログイン時のウェルカム画面 -->
+            <div v-if="!user && !loading" class="welcome-section">
+                <div class="card" style="text-align: center; padding: 3rem;">
+                    <h1 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem;">
+                        📚 読書習慣を育てる、あなたの本の森へようこそ
+                    </h1>
+                    <p style="font-size: 1.2rem; color: var(--light-text); margin-bottom: 2rem;">
+                        積読を解消し、読書ペースを可視化。目標達成をサポートします。
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button @click="showLoginModal = true" class="btn btn-primary">今すぐ始める（無料）</button>
+                        <button @click="showDemo" class="btn btn-secondary">デモを見る</button>
+                    </div>
+                </div>
+                
+                <!-- 特徴紹介 -->
+                <div class="stats-grid" style="margin-top: 2rem;">
+                    <div class="stat-card">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📖</div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">進捗管理</h3>
+                        <p style="color: var(--light-text);">読書ペースを可視化し、完読予想日を表示</p>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📊</div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">統計分析</h3>
+                        <p style="color: var(--light-text);">月別・ジャンル別の読書傾向を分析</p>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎯</div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">目標設定</h3>
+                        <p style="color: var(--light-text);">月間・年間の読書目標を設定＆達成</p>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏆</div>
+                        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">バッジ獲得</h3>
+                        <p style="color: var(--light-text);">読書実績に応じてバッジや称号を獲得</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ログイン後のコンテンツ -->
+            <div v-else-if="user">
+                <!-- ダッシュボード -->
+                <div v-if="currentView === 'dashboard'">
+                    <h2 style="margin-bottom: 2rem; color: var(--primary-color);">{{ t('dashboard') }}</h2>
+                    
+                    <!-- 今月の統計 -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ monthlyStats.completed }}</div>
+                            <div class="stat-label">{{ t('booksCompletedThisMonth') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ monthlyStats.reading }}</div>
+                            <div class="stat-label">{{ t('currentlyReading') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ monthlyStats.pages }}p</div>
+                            <div class="stat-label">{{ t('pagesReadThisMonth') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ monthlyStats.goalProgress }}%</div>
+                            <div class="stat-label">{{ t('monthlyGoalProgress') }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 読書中の本 -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
+                            <h3>{{ t('currentlyReadingBooks') }}</h3>
+                            <button @click="showAddBookModal = true" class="btn btn-primary" style="margin-left: auto;">
+                                + {{ t('addBook') }}
+                            </button>
+                        </div>
+                        
+                        <div v-if="readingBooks.length === 0" style="text-align: center; padding: 2rem; color: var(--light-text);">
+                            <p>{{ t('noReadingBooks') }}</p>
+                        </div>
+                        
+                        <div v-else>
+                            <div v-for="book in readingBooks" :key="book.id" class="book-card">
+                                <div class="book-cover">
+                                    <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title">
+                                    <svg v-else viewBox="0 0 80 120" fill="var(--secondary-color)" style="width: 60%;">
+                                        <rect width="80" height="120" fill="currentColor" opacity="0.2"/>
+                                        <path d="M20 30h40v10H20zM20 50h40v2H20zM20 60h40v2H20zM20 70h40v2H20z" fill="currentColor" opacity="0.5"/>
+                                    </svg>
+                                </div>
+                                <div class="book-info">
+                                    <div class="book-title">{{ book.title }}</div>
+                                    <div class="book-author">{{ book.author }}</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" :style="{width: book.progress + '%'}">
+                                            {{ book.progress }}%
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: var(--font-size-sm); color: var(--light-text);">
+                                        <span>{{ book.currentPage }} / {{ book.totalPages }} {{ t('pages') }}</span>
+                                        <span>{{ t('expectedCompletion') }}: {{ formatDate(book.expectedCompletion) }}</span>
+                                    </div>
+                                    <button @click="updateProgress(book)" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                                        {{ t('updateProgress') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 今日の読書提案 -->
+                    <div class="card" style="background: linear-gradient(135deg, var(--light-green), white);">
+                        <h3 style="margin-bottom: 1rem;">{{ t('todaysReadingSuggestion') }}</h3>
+                        <p>{{ readingSuggestion }}</p>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge">{{ t('suggestedTime') }}: {{ suggestedReadingTime }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 本棚 -->
+                <div v-if="currentView === 'bookshelf'">
+                    <h2 style="margin-bottom: 2rem; color: var(--primary-color);">{{ t('myBookshelf') }}</h2>
+                    
+                    <!-- タブ -->
+                    <div class="tabs">
+                        <div class="tab" :class="{active: bookshelfTab === 'all'}" @click="bookshelfTab = 'all'">
+                            {{ t('allBooks') }} ({{ allBooks.length }})
+                        </div>
+                        <div class="tab" :class="{active: bookshelfTab === 'reading'}" @click="bookshelfTab = 'reading'">
+                            {{ t('reading') }} ({{ readingBooks.length }})
+                        </div>
+                        <div class="tab" :class="{active: bookshelfTab === 'completed'}" @click="bookshelfTab = 'completed'">
+                            {{ t('completed') }} ({{ completedBooks.length }})
+                        </div>
+                        <div class="tab" :class="{active: bookshelfTab === 'wishlist'}" @click="bookshelfTab = 'wishlist'">
+                            {{ t('wishlist') }} ({{ wishlistBooks.length }})
+                        </div>
+                    </div>
+                    
+                    <!-- 本のリスト -->
+                    <div class="card">
+                        <div v-if="filteredBooks.length === 0" style="text-align: center; padding: 2rem; color: var(--light-text);">
+                            <p>{{ t('noBooksInCategory') }}</p>
+                        </div>
+                        
+                        <div v-else>
+                            <div v-for="book in filteredBooks" :key="book.id" class="book-card">
+                                <div class="book-cover">
+                                    <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title">
+                                    <svg v-else viewBox="0 0 80 120" fill="var(--secondary-color)" style="width: 60%;">
+                                        <rect width="80" height="120" fill="currentColor" opacity="0.2"/>
+                                        <path d="M20 30h40v10H20zM20 50h40v2H20zM20 60h40v2H20zM20 70h40v2H20z" fill="currentColor" opacity="0.5"/>
+                                    </svg>
+                                </div>
+                                <div class="book-info">
+                                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                                        <div>
+                                            <div class="book-title">{{ book.title }}</div>
+                                            <div class="book-author">{{ book.author }}</div>
+                                        </div>
+                                        <button @click="toggleFavorite(book)" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">
+                                            {{ book.favorite ? '⭐' : '☆' }}
+                                        </button>
+                                    </div>
+                                    <div style="margin: 0.5rem 0;">
+                                        <span v-for="tag in book.tags" :key="tag" class="badge" style="margin-right: 0.5rem;">
+                                            {{ tag }}
+                                        </span>
+                                    </div>
+                                    <div v-if="book.status === 'completed'" style="margin: 0.5rem 0;">
+                                        <span style="color: var(--accent-color);">{{ '★'.repeat(book.rating) }}{{ '☆'.repeat(5 - book.rating) }}</span>
+                                        <span style="margin-left: 1rem; color: var(--light-text); font-size: var(--font-size-sm);">
+                                            {{ t('completedOn') }}: {{ formatDate(book.completedDate) }}
+                                        </span>
+                                    </div>
+                                    <div v-if="book.memo" style="color: var(--light-text); font-size: var(--font-size-sm); margin-top: 0.5rem;">
+                                        {{ book.memo }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 統計 -->
+                <div v-if="currentView === 'stats'">
+                    <h2 style="margin-bottom: 2rem; color: var(--primary-color);">{{ t('readingStats') }}</h2>
+                    
+                    <!-- 年間統計 -->
+                    <div class="stats-grid" style="margin-bottom: 2rem;">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ yearlyStats.totalBooks }}</div>
+                            <div class="stat-label">{{ t('booksReadThisYear') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ yearlyStats.totalPages }}</div>
+                            <div class="stat-label">{{ t('totalPagesRead') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ yearlyStats.avgPagesPerDay }}</div>
+                            <div class="stat-label">{{ t('avgPagesPerDay') }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ yearlyStats.favoriteGenre }}</div>
+                            <div class="stat-label">{{ t('favoriteGenre') }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 月別読書数グラフ -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('monthlyReadingChart') }}</h3>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    
+                    <!-- ジャンル別割合 -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('genreDistribution') }}</h3>
+                        <canvas id="genreChart"></canvas>
+                    </div>
+                    
+                    <!-- 読書バッジ -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('readingBadges') }}</h3>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div v-for="badge in earnedBadges" :key="badge.id" style="text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 0.5rem;">{{ badge.icon }}</div>
+                                <div class="badge" :class="'badge-' + badge.level">{{ badge.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 目標設定 -->
+                <div v-if="currentView === 'goals'">
+                    <h2 style="margin-bottom: 2rem; color: var(--primary-color);">{{ t('readingGoals') }}</h2>
+                    
+                    <!-- 現在の目標 -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('currentGoals') }}</h3>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 0.5rem;">{{ t('monthlyGoal') }}</h4>
+                            <div class="progress-bar" style="height: 30px;">
+                                <div class="progress-fill" :style="{width: monthlyGoalProgress + '%'}">
+                                    {{ currentMonthlyBooks }} / {{ monthlyGoal }} {{ t('books') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">{{ t('yearlyGoal') }}</h4>
+                            <div class="progress-bar" style="height: 30px;">
+                                <div class="progress-fill" :style="{width: yearlyGoalProgress + '%'}">
+                                    {{ currentYearlyBooks }} / {{ yearlyGoal }} {{ t('books') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 目標設定フォーム -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('setGoals') }}</h3>
+                        
+                        <form @submit.prevent="saveGoals">
+                            <div class="form-group">
+                                <label class="form-label">{{ t('monthlyBookGoal') }}</label>
+                                <input type="number" v-model="monthlyGoal" min="1" max="50" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">{{ t('yearlyBookGoal') }}</label>
+                                <input type="number" v-model="yearlyGoal" min="1" max="365" class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">{{ t('dailyPageGoal') }}</label>
+                                <input type="number" v-model="dailyPageGoal" min="1" max="500" class="form-input">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">{{ t('saveGoals') }}</button>
+                        </form>
+                    </div>
+                    
+                    <!-- 読書チャレンジ -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">{{ t('readingChallenges') }}</h3>
+                        <div style="display: grid; gap: 1rem;">
+                            <div v-for="challenge in challenges" :key="challenge.id" class="book-card">
+                                <div style="flex: 1;">
+                                    <h4 style="color: var(--primary-color);">{{ challenge.name }}</h4>
+                                    <p style="color: var(--light-text); margin: 0.5rem 0;">{{ challenge.description }}</p>
+                                    <div class="progress-bar" style="height: 20px;">
+                                        <div class="progress-fill" :style="{width: challenge.progress + '%'}">
+                                            {{ challenge.progress }}%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="challenge.completed" class="badge badge-gold">
+                                    {{ t('completed') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ローディング -->
+            <div v-if="loading" class="loading">
+                <div class="spinner"></div>
+            </div>
+        </main>
+        
+        <!-- フッター -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>本の森</h3>
+                    <p style="margin-top: 0.5rem; opacity: 0.8;">
+                        読書習慣を育てる、あなたの本の森
+                    </p>
+                    <div style="margin-top: 1rem;">
+                        <a href="https://x.com/appadaycreator" target="_blank" style="color: white; text-decoration: none;">
+                            Follow @appadaycreator
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>{{ t('links') }}</h3>
+                    <ul class="footer-links">
+                        <li><a href="usage.html">{{ t('howToUse') }}</a></li>
+                        <li><a href="terms.html">{{ t('termsOfService') }}</a></li>
+                        <li><a href="privacy.html">{{ t('privacyPolicy') }}</a></li>
+                        <li><a href="disclaimer.html">{{ t('disclaimer') }}</a></li>
+                        <li><a href="contact.html">{{ t('contact') }}</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>{{ t('recommendedBooks') }}</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://px.a8.net/svt/ejp?a8mat=3Z2TT2+1ZZZXY+3UGE+5ZMCJ" rel="nofollow" target="_blank">電子書籍ストア</a></li>
+                        <li><a href="https://amzn.to/bookshelf" rel="nofollow" target="_blank">本棚・ブックスタンド</a></li>
+                        <li><a href="https://px.a8.net/svt/ejp?a8mat=3Z2TT2+1ZZZXY+4CZY+5YZ77" rel="nofollow" target="_blank">読書灯・デスクライト</a></li>
+                        <li><a href="https://amzn.to/stationery" rel="nofollow" target="_blank">しおり・文具</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>{{ t('share') }}</h3>
+                    <p style="margin-bottom: 1rem; opacity: 0.8;">{{ t('shareMessage') }}</p>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button @click="shareToX" class="btn btn-secondary">X</button>
+                        <button @click="shareToFacebook" class="btn btn-secondary">Facebook</button>
+                        <button @click="shareToLine" class="btn btn-secondary">LINE</button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- ログインモーダル -->
+        <div class="modal" :class="{active: showLoginModal}">
+            <div class="modal-content">
+                <h2 style="margin-bottom: 1rem;">{{ t('loginOrSignup') }}</h2>
+                
+                <form @submit.prevent="handleAuth">
+                    <div class="form-group">
+                        <label class="form-label">{{ t('email') }}</label>
+                        <input type="email" v-model="authEmail" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('password') }}</label>
+                        <input type="password" v-model="authPassword" required class="form-input">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" name="login" class="btn btn-primary">{{ t('login') }}</button>
+                        <button type="submit" name="signup" @click="isSignup = true" class="btn btn-secondary">{{ t('signup') }}</button>
+                        <button type="button" @click="showLoginModal = false" class="btn btn-secondary">{{ t('cancel') }}</button>
+                    </div>
+                </form>
+                
+                <div v-if="authError" style="margin-top: 1rem; color: red;">
+                    {{ authError }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 本を追加モーダル -->
+        <div class="modal" :class="{active: showAddBookModal}">
+            <div class="modal-content">
+                <h2 style="margin-bottom: 1rem;">{{ t('addNewBook') }}</h2>
+                
+                <form @submit.prevent="addBook">
+                    <div class="form-group">
+                        <label class="form-label">{{ t('bookTitle') }}</label>
+                        <input type="text" v-model="newBook.title" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('author') }}</label>
+                        <input type="text" v-model="newBook.author" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('isbn') }}</label>
+                        <input type="text" v-model="newBook.isbn" class="form-input" placeholder="978-4-123456-78-9">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('totalPages') }}</label>
+                        <input type="number" v-model="newBook.totalPages" min="1" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('genre') }}</label>
+                        <select v-model="newBook.genre" class="form-input">
+                            <option value="">{{ t('selectGenre') }}</option>
+                            <option value="fiction">{{ t('fiction') }}</option>
+                            <option value="nonfiction">{{ t('nonfiction') }}</option>
+                            <option value="business">{{ t('business') }}</option>
+                            <option value="selfhelp">{{ t('selfHelp') }}</option>
+                            <option value="technology">{{ t('technology') }}</option>
+                            <option value="history">{{ t('history') }}</option>
+                            <option value="science">{{ t('science') }}</option>
+                            <option value="other">{{ t('other') }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('tags') }}</label>
+                        <input type="text" v-model="newBook.tagsInput" class="form-input" :placeholder="t('tagsPlaceholder')">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('status') }}</label>
+                        <select v-model="newBook.status" class="form-input">
+                            <option value="wishlist">{{ t('wishlist') }}</option>
+                            <option value="reading">{{ t('reading') }}</option>
+                            <option value="completed">{{ t('completed') }}</option>
+                        </select>
+                    </div>
+                    
+                    <div v-if="newBook.status === 'reading'" class="form-group">
+                        <label class="form-label">{{ t('currentPage') }}</label>
+                        <input type="number" v-model="newBook.currentPage" min="0" :max="newBook.totalPages" class="form-input">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">{{ t('add') }}</button>
+                        <button type="button" @click="cancelAddBook" class="btn btn-secondary">{{ t('cancel') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 進捗更新モーダル -->
+        <div class="modal" :class="{active: showUpdateModal}">
+            <div class="modal-content" v-if="updateBook">
+                <h2 style="margin-bottom: 1rem;">{{ t('updateReadingProgress') }}</h2>
+                
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">{{ updateBook.title }}</h3>
+                
+                <form @submit.prevent="saveProgress">
+                    <div class="form-group">
+                        <label class="form-label">{{ t('currentPage') }}</label>
+                        <input type="number" v-model="updateBook.currentPage" min="0" :max="updateBook.totalPages" required class="form-input">
+                        <p style="margin-top: 0.5rem; color: var(--light-text);">
+                            {{ t('totalPages') }}: {{ updateBook.totalPages }}
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('readingTime') }} ({{ t('minutes') }})</label>
+                        <input type="number" v-model="readingTime" min="1" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('memo') }}</label>
+                        <textarea v-model="readingMemo" rows="3" class="form-input"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ t('favoriteQuote') }}</label>
+                        <textarea v-model="favoriteQuote" rows="2" class="form-input"></textarea>
+                    </div>
+                    
+                    <div v-if="updateBook.currentPage == updateBook.totalPages" class="form-group">
+                        <label class="form-label">{{ t('rating') }}</label>
+                        <div style="font-size: 2rem;">
+                            <span v-for="i in 5" :key="i" @click="updateBook.rating = i" style="cursor: pointer;">
+                                {{ i <= updateBook.rating ? '★' : '☆' }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">{{ t('save') }}</button>
+                        <button type="button" @click="showUpdateModal = false" class="btn btn-secondary">{{ t('cancel') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        // Supabase設定
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        let supabase = null;
+        
+        // 翻訳
+        const translations = {
+            ja: {
+                login: 'ログイン',
+                logout: 'ログアウト',
+                signup: '新規登録',
+                dashboard: 'ダッシュボード',
+                myBookshelf: '私の本棚',
+                readingStats: '読書統計',
+                readingGoals: '読書目標',
+                booksCompletedThisMonth: '今月の完読冊数',
+                currentlyReading: '読書中',
+                pagesReadThisMonth: '今月の読書ページ数',
+                monthlyGoalProgress: '月間目標達成率',
+                currentlyReadingBooks: '読書中の本',
+                addBook: '本を追加',
+                noReadingBooks: '現在読書中の本はありません',
+                pages: 'ページ',
+                expectedCompletion: '完読予定日',
+                updateProgress: '進捗を更新',
+                todaysReadingSuggestion: '今日の読書提案',
+                suggestedTime: 'おすすめ時間',
+                allBooks: 'すべて',
+                reading: '読書中',
+                completed: '完読',
+                wishlist: '読みたい',
+                noBooksInCategory: 'このカテゴリに本はありません',
+                completedOn: '完読日',
+                booksReadThisYear: '今年の読書冊数',
+                totalPagesRead: '総読書ページ数',
+                avgPagesPerDay: '1日平均ページ数',
+                favoriteGenre: 'お気に入りジャンル',
+                monthlyReadingChart: '月別読書冊数',
+                genreDistribution: 'ジャンル別割合',
+                readingBadges: '獲得バッジ',
+                currentGoals: '現在の目標',
+                monthlyGoal: '月間目標',
+                yearlyGoal: '年間目標',
+                books: '冊',
+                setGoals: '目標を設定',
+                monthlyBookGoal: '月間読書目標（冊）',
+                yearlyBookGoal: '年間読書目標（冊）',
+                dailyPageGoal: '1日の読書ページ目標',
+                saveGoals: '目標を保存',
+                readingChallenges: '読書チャレンジ',
+                links: 'リンク',
+                howToUse: '使い方',
+                termsOfService: '利用規約',
+                privacyPolicy: 'プライバシーポリシー',
+                disclaimer: '免責事項',
+                contact: 'お問い合わせ',
+                recommendedBooks: 'おすすめ書籍・グッズ',
+                share: 'シェア',
+                shareMessage: '読書習慣を友達にも広めよう',
+                loginOrSignup: 'ログイン / 新規登録',
+                email: 'メールアドレス',
+                password: 'パスワード',
+                cancel: 'キャンセル',
+                addNewBook: '新しい本を追加',
+                bookTitle: '書籍タイトル',
+                author: '著者',
+                isbn: 'ISBN',
+                totalPages: '総ページ数',
+                genre: 'ジャンル',
+                selectGenre: 'ジャンルを選択',
+                fiction: '小説',
+                nonfiction: 'ノンフィクション',
+                business: 'ビジネス',
+                selfHelp: '自己啓発',
+                technology: 'テクノロジー',
+                history: '歴史',
+                science: '科学',
+                other: 'その他',
+                tags: 'タグ',
+                tagsPlaceholder: 'カンマ区切りで入力',
+                status: 'ステータス',
+                currentPage: '現在のページ',
+                add: '追加',
+                updateReadingProgress: '読書進捗を更新',
+                readingTime: '読書時間',
+                minutes: '分',
+                memo: 'メモ',
+                favoriteQuote: 'お気に入りの引用',
+                rating: '評価',
+                save: '保存'
+            },
+            en: {
+                login: 'Login',
+                logout: 'Logout',
+                signup: 'Sign Up',
+                dashboard: 'Dashboard',
+                myBookshelf: 'My Bookshelf',
+                readingStats: 'Reading Stats',
+                readingGoals: 'Reading Goals',
+                booksCompletedThisMonth: 'Books Completed This Month',
+                currentlyReading: 'Currently Reading',
+                pagesReadThisMonth: 'Pages Read This Month',
+                monthlyGoalProgress: 'Monthly Goal Progress',
+                currentlyReadingBooks: 'Currently Reading Books',
+                addBook: 'Add Book',
+                noReadingBooks: 'No books currently being read',
+                pages: 'pages',
+                expectedCompletion: 'Expected Completion',
+                updateProgress: 'Update Progress',
+                todaysReadingSuggestion: "Today's Reading Suggestion",
+                suggestedTime: 'Suggested Time',
+                allBooks: 'All',
+                reading: 'Reading',
+                completed: 'Completed',
+                wishlist: 'Wishlist',
+                noBooksInCategory: 'No books in this category',
+                completedOn: 'Completed on',
+                booksReadThisYear: 'Books Read This Year',
+                totalPagesRead: 'Total Pages Read',
+                avgPagesPerDay: 'Avg Pages/Day',
+                favoriteGenre: 'Favorite Genre',
+                monthlyReadingChart: 'Monthly Reading Chart',
+                genreDistribution: 'Genre Distribution',
+                readingBadges: 'Earned Badges',
+                currentGoals: 'Current Goals',
+                monthlyGoal: 'Monthly Goal',
+                yearlyGoal: 'Yearly Goal',
+                books: 'books',
+                setGoals: 'Set Goals',
+                monthlyBookGoal: 'Monthly Book Goal',
+                yearlyBookGoal: 'Yearly Book Goal',
+                dailyPageGoal: 'Daily Page Goal',
+                saveGoals: 'Save Goals',
+                readingChallenges: 'Reading Challenges',
+                links: 'Links',
+                howToUse: 'How to Use',
+                termsOfService: 'Terms of Service',
+                privacyPolicy: 'Privacy Policy',
+                disclaimer: 'Disclaimer',
+                contact: 'Contact',
+                recommendedBooks: 'Recommended Books & Goods',
+                share: 'Share',
+                shareMessage: 'Share reading habits with friends',
+                loginOrSignup: 'Login / Sign Up',
+                email: 'Email',
+                password: 'Password',
+                cancel: 'Cancel',
+                addNewBook: 'Add New Book',
+                bookTitle: 'Book Title',
+                author: 'Author',
+                isbn: 'ISBN',
+                totalPages: 'Total Pages',
+                genre: 'Genre',
+                selectGenre: 'Select Genre',
+                fiction: 'Fiction',
+                nonfiction: 'Non-fiction',
+                business: 'Business',
+                selfHelp: 'Self-Help',
+                technology: 'Technology',
+                history: 'History',
+                science: 'Science',
+                other: 'Other',
+                tags: 'Tags',
+                tagsPlaceholder: 'Separate with commas',
+                status: 'Status',
+                currentPage: 'Current Page',
+                add: 'Add',
+                updateReadingProgress: 'Update Reading Progress',
+                readingTime: 'Reading Time',
+                minutes: 'minutes',
+                memo: 'Memo',
+                favoriteQuote: 'Favorite Quote',
+                rating: 'Rating',
+                save: 'Save'
+            }
+        };
+        
+        createApp({
+            data() {
+                return {
+                    // ユーザー認証
+                    user: null,
+                    loading: false,
+                    authEmail: '',
+                    authPassword: '',
+                    authError: '',
+                    isSignup: false,
+                    
+                    // UI状態
+                    currentView: 'dashboard',
+                    bookshelfTab: 'all',
+                    language: 'ja',
+                    fontSize: 'base',
+                    showLoginModal: false,
+                    showAddBookModal: false,
+                    showUpdateModal: false,
+                    
+                    // 本のデータ
+                    books: [],
+                    newBook: this.getEmptyBook(),
+                    updateBook: null,
+                    readingTime: 30,
+                    readingMemo: '',
+                    favoriteQuote: '',
+                    
+                    // 目標設定
+                    monthlyGoal: 5,
+                    yearlyGoal: 50,
+                    dailyPageGoal: 30,
+                    
+                    // 統計データ
+                    monthlyStats: {
+                        completed: 0,
+                        reading: 0,
+                        pages: 0,
+                        goalProgress: 0
+                    },
+                    yearlyStats: {
+                        totalBooks: 0,
+                        totalPages: 0,
+                        avgPagesPerDay: 0,
+                        favoriteGenre: 'ビジネス'
+                    },
+                    
+                    // その他
+                    readingSuggestion: '',
+                    suggestedReadingTime: '30分',
+                    challenges: [],
+                    earnedBadges: []
+                };
+            },
+            
+            computed: {
+                t() {
+                    return (key) => translations[this.language][key] || key;
+                },
+                
+                readingBooks() {
+                    return this.books.filter(book => book.status === 'reading');
+                },
+                
+                completedBooks() {
+                    return this.books.filter(book => book.status === 'completed');
+                },
+                
+                wishlistBooks() {
+                    return this.books.filter(book => book.status === 'wishlist');
+                },
+                
+                allBooks() {
+                    return this.books;
+                },
+                
+                filteredBooks() {
+                    switch(this.bookshelfTab) {
+                        case 'reading': return this.readingBooks;
+                        case 'completed': return this.completedBooks;
+                        case 'wishlist': return this.wishlistBooks;
+                        default: return this.allBooks;
+                    }
+                },
+                
+                currentMonthlyBooks() {
+                    const now = new Date();
+                    return this.completedBooks.filter(book => {
+                        const completedDate = new Date(book.completedDate);
+                        return completedDate.getMonth() === now.getMonth() &&
+                               completedDate.getFullYear() === now.getFullYear();
+                    }).length;
+                },
+                
+                currentYearlyBooks() {
+                    const now = new Date();
+                    return this.completedBooks.filter(book => {
+                        const completedDate = new Date(book.completedDate);
+                        return completedDate.getFullYear() === now.getFullYear();
+                    }).length;
+                },
+                
+                monthlyGoalProgress() {
+                    return Math.min(100, Math.round((this.currentMonthlyBooks / this.monthlyGoal) * 100));
+                },
+                
+                yearlyGoalProgress() {
+                    return Math.min(100, Math.round((this.currentYearlyBooks / this.yearlyGoal) * 100));
+                }
+            },
+            
+            methods: {
+                // 初期化
+                async init() {
+                    // Supabase初期化
+                    if (supabaseUrl !== 'YOUR_SUPABASE_URL') {
+                        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                        
+                        // セッション確認
+                        const { data: { session } } = await supabase.auth.getSession();
+                        if (session) {
+                            this.user = session.user;
+                            await this.loadUserData();
+                        }
+                    } else {
+                        // デモモード
+                        this.loadDemoData();
+                    }
+                    
+                    // ローカルストレージから設定読み込み
+                    const savedLang = localStorage.getItem('language');
+                    if (savedLang) this.language = savedLang;
+                    
+                    const savedFontSize = localStorage.getItem('fontSize');
+                    if (savedFontSize) {
+                        this.fontSize = savedFontSize;
+                        document.body.className = `font-${savedFontSize}`;
+                    }
+                    
+                    // 読書提案を生成
+                    this.generateReadingSuggestion();
+                    
+                    // バッジとチャレンジを初期化
+                    this.initializeBadgesAndChallenges();
+                    
+                    // day.js日本語設定
+                    dayjs.locale('ja');
+                },
+                
+                // 認証
+                async handleAuth(event) {
+                    this.loading = true;
+                    this.authError = '';
+                    
+                    try {
+                        if (supabase) {
+                            if (this.isSignup || event.submitter.name === 'signup') {
+                                const { data, error } = await supabase.auth.signUp({
+                                    email: this.authEmail,
+                                    password: this.authPassword
+                                });
+                                if (error) throw error;
+                                this.authError = '確認メールを送信しました。メールを確認してください。';
+                            } else {
+                                const { data, error } = await supabase.auth.signIn({
+                                    email: this.authEmail,
+                                    password: this.authPassword
+                                });
+                                if (error) throw error;
+                                this.user = data.user;
+                                this.showLoginModal = false;
+                                await this.loadUserData();
+                            }
+                        } else {
+                            // デモモード
+                            this.user = { email: this.authEmail };
+                            this.showLoginModal = false;
+                            this.loadDemoData();
+                        }
+                    } catch (error) {
+                        this.authError = error.message;
+                    } finally {
+                        this.loading = false;
+                        this.isSignup = false;
+                    }
+                },
+                
+                async logout() {
+                    if (supabase) {
+                        await supabase.auth.signOut();
+                    }
+                    this.user = null;
+                    this.books = [];
+                },
+                
+                // データ読み込み
+                async loadUserData() {
+                    if (!supabase || !this.user) return;
+                    
+                    try {
+                        // 本のデータを取得
+                        const { data: books, error } = await supabase
+                            .from('books')
+                            .select('*')
+                            .eq('user_id', this.user.id)
+                            .order('created_at', { ascending: false });
+                        
+                        if (error) throw error;
+                        this.books = books || [];
+                        
+                        // 目標データを取得
+                        const { data: goals } = await supabase
+                            .from('goals')
+                            .select('*')
+                            .eq('user_id', this.user.id)
+                            .single();
+                        
+                        if (goals) {
+                            this.monthlyGoal = goals.monthly_goal || 5;
+                            this.yearlyGoal = goals.yearly_goal || 50;
+                            this.dailyPageGoal = goals.daily_page_goal || 30;
+                        }
+                        
+                        this.updateStats();
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                    }
+                },
+                
+                loadDemoData() {
+                    // デモデータ
+                    this.books = [
+                        {
+                            id: 1,
+                            title: '人を動かす',
+                            author: 'デール・カーネギー',
+                            totalPages: 320,
+                            currentPage: 156,
+                            status: 'reading',
+                            genre: 'business',
+                            tags: ['コミュニケーション', '自己啓発'],
+                            progress: 49,
+                            expectedCompletion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                            favorite: true
+                        },
+                        {
+                            id: 2,
+                            title: 'Clean Code',
+                            author: 'Robert C. Martin',
+                            totalPages: 464,
+                            currentPage: 464,
+                            status: 'completed',
+                            genre: 'technology',
+                            tags: ['プログラミング', '設計'],
+                            progress: 100,
+                            completedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+                            rating: 5,
+                            favorite: true
+                        },
+                        {
+                            id: 3,
+                            title: 'サピエンス全史',
+                            author: 'ユヴァル・ノア・ハラリ',
+                            totalPages: 592,
+                            currentPage: 0,
+                            status: 'wishlist',
+                            genre: 'history',
+                            tags: ['歴史', '人類学'],
+                            progress: 0,
+                            favorite: false
+                        }
+                    ];
+                    
+                    this.updateStats();
+                },
+                
+                // 本の追加
+                async addBook() {
+                    const newBook = {
+                        ...this.newBook,
+                        tags: this.newBook.tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag),
+                        progress: this.newBook.status === 'completed' ? 100 : 
+                                 this.newBook.status === 'reading' ? Math.round((this.newBook.currentPage / this.newBook.totalPages) * 100) : 0,
+                        created_at: new Date(),
+                        user_id: this.user?.id
+                    };
+                    
+                    if (this.newBook.status === 'reading') {
+                        newBook.expectedCompletion = this.calculateExpectedCompletion(
+                            this.newBook.currentPage,
+                            this.newBook.totalPages
+                        );
+                    }
+                    
+                    if (supabase && this.user) {
+                        try {
+                            const { data, error } = await supabase
+                                .from('books')
+                                .insert([newBook])
+                                .select();
+                            
+                            if (error) throw error;
+                            this.books.unshift(data[0]);
+                        } catch (error) {
+                            console.error('Error adding book:', error);
+                        }
+                    } else {
+                        // デモモード
+                        newBook.id = Date.now();
+                        this.books.unshift(newBook);
+                    }
+                    
+                    this.showAddBookModal = false;
+                    this.newBook = this.getEmptyBook();
+                    this.updateStats();
+                },
+                
+                cancelAddBook() {
+                    this.showAddBookModal = false;
+                    this.newBook = this.getEmptyBook();
+                },
+                
+                getEmptyBook() {
+                    return {
+                        title: '',
+                        author: '',
+                        isbn: '',
+                        totalPages: '',
+                        currentPage: 0,
+                        genre: '',
+                        tagsInput: '',
+                        status: 'wishlist',
+                        memo: '',
+                        favorite: false,
+                        rating: 0
+                    };
+                },
+                
+                // 進捗更新
+                updateProgress(book) {
+                    this.updateBook = { ...book };
+                    this.showUpdateModal = true;
+                },
+                
+                async saveProgress() {
+                    const progress = Math.round((this.updateBook.currentPage / this.updateBook.totalPages) * 100);
+                    const updates = {
+                        currentPage: this.updateBook.currentPage,
+                        progress: progress,
+                        expectedCompletion: this.calculateExpectedCompletion(
+                            this.updateBook.currentPage,
+                            this.updateBook.totalPages
+                        ),
+                        updated_at: new Date()
+                    };
+                    
+                    if (this.updateBook.currentPage === this.updateBook.totalPages) {
+                        updates.status = 'completed';
+                        updates.completedDate = new Date();
+                        updates.rating = this.updateBook.rating || 3;
+                    }
+                    
+                    if (this.readingMemo) {
+                        updates.memo = this.readingMemo;
+                    }
+                    
+                    if (supabase && this.user) {
+                        try {
+                            const { error } = await supabase
+                                .from('books')
+                                .update(updates)
+                                .eq('id', this.updateBook.id);
+                            
+                            if (error) throw error;
+                        } catch (error) {
+                            console.error('Error updating progress:', error);
+                        }
+                    }
+                    
+                    // ローカルデータも更新
+                    const bookIndex = this.books.findIndex(b => b.id === this.updateBook.id);
+                    if (bookIndex !== -1) {
+                        Object.assign(this.books[bookIndex], updates);
+                    }
+                    
+                    this.showUpdateModal = false;
+                    this.updateBook = null;
+                    this.readingMemo = '';
+                    this.favoriteQuote = '';
+                    this.updateStats();
+                },
+                
+                // お気に入り切り替え
+                async toggleFavorite(book) {
+                    book.favorite = !book.favorite;
+                    
+                    if (supabase && this.user) {
+                        try {
+                            await supabase
+                                .from('books')
+                                .update({ favorite: book.favorite })
+                                .eq('id', book.id);
+                        } catch (error) {
+                            console.error('Error updating favorite:', error);
+                        }
+                    }
+                },
+                
+                // 統計更新
+                updateStats() {
+                    const now = new Date();
+                    const thisMonth = this.books.filter(book => {
+                        const date = new Date(book.created_at);
+                        return date.getMonth() === now.getMonth() && 
+                               date.getFullYear() === now.getFullYear();
+                    });
+                    
+                    this.monthlyStats = {
+                        completed: thisMonth.filter(b => b.status === 'completed').length,
+                        reading: this.readingBooks.length,
+                        pages: thisMonth.reduce((sum, book) => {
+                            if (book.status === 'completed') return sum + book.totalPages;
+                            if (book.status === 'reading') return sum + book.currentPage;
+                            return sum;
+                        }, 0),
+                        goalProgress: this.monthlyGoalProgress
+                    };
+                    
+                    // グラフ更新
+                    this.$nextTick(() => {
+                        if (this.currentView === 'stats') {
+                            this.updateCharts();
+                        }
+                    });
+                },
+                
+                // グラフ描画
+                updateCharts() {
+                    // 月別読書数グラフ
+                    const monthlyCtx = document.getElementById('monthlyChart');
+                    if (monthlyCtx) {
+                        const monthlyData = this.getMonthlyData();
+                        new Chart(monthlyCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: monthlyData.labels,
+                                datasets: [{
+                                    label: '読書冊数',
+                                    data: monthlyData.data,
+                                    backgroundColor: 'rgba(139, 195, 74, 0.5)',
+                                    borderColor: 'rgba(139, 195, 74, 1)',
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // ジャンル別グラフ
+                    const genreCtx = document.getElementById('genreChart');
+                    if (genreCtx) {
+                        const genreData = this.getGenreData();
+                        new Chart(genreCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: genreData.labels,
+                                datasets: [{
+                                    data: genreData.data,
+                                    backgroundColor: [
+                                        '#4CAF50',
+                                        '#8BC34A',
+                                        '#CDDC39',
+                                        '#FFC107',
+                                        '#FF9800',
+                                        '#FF5722',
+                                        '#795548',
+                                        '#607D8B'
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true
+                            }
+                        });
+                    }
+                },
+                
+                getMonthlyData() {
+                    const months = [];
+                    const counts = [];
+                    
+                    for (let i = 5; i >= 0; i--) {
+                        const date = new Date();
+                        date.setMonth(date.getMonth() - i);
+                        
+                        const monthBooks = this.completedBooks.filter(book => {
+                            const completedDate = new Date(book.completedDate);
+                            return completedDate.getMonth() === date.getMonth() &&
+                                   completedDate.getFullYear() === date.getFullYear();
+                        });
+                        
+                        months.push(date.toLocaleDateString(this.language, { month: 'short' }));
+                        counts.push(monthBooks.length);
+                    }
+                    
+                    return { labels: months, data: counts };
+                },
+                
+                getGenreData() {
+                    const genreCounts = {};
+                    this.books.forEach(book => {
+                        if (book.genre) {
+                            genreCounts[book.genre] = (genreCounts[book.genre] || 0) + 1;
+                        }
+                    });
+                    
+                    const genreNames = {
+                        fiction: this.t('fiction'),
+                        nonfiction: this.t('nonfiction'),
+                        business: this.t('business'),
+                        selfhelp: this.t('selfHelp'),
+                        technology: this.t('technology'),
+                        history: this.t('history'),
+                        science: this.t('science'),
+                        other: this.t('other')
+                    };
+                    
+                    return {
+                        labels: Object.keys(genreCounts).map(key => genreNames[key] || key),
+                        data: Object.values(genreCounts)
+                    };
+                },
+                
+                // 目標保存
+                async saveGoals() {
+                    if (supabase && this.user) {
+                        try {
+                            const { error } = await supabase
+                                .from('goals')
+                                .upsert({
+                                    user_id: this.user.id,
+                                    monthly_goal: this.monthlyGoal,
+                                    yearly_goal: this.yearlyGoal,
+                                    daily_page_goal: this.dailyPageGoal,
+                                    updated_at: new Date()
+                                });
+                            
+                            if (error) throw error;
+                        } catch (error) {
+                            console.error('Error saving goals:', error);
+                        }
+                    }
+                    
+                    // ローカルストレージにも保存
+                    localStorage.setItem('readingGoals', JSON.stringify({
+                        monthly: this.monthlyGoal,
+                        yearly: this.yearlyGoal,
+                        dailyPage: this.dailyPageGoal
+                    }));
+                    
+                    alert(this.t('saveGoals') + '!');
+                },
+                
+                // ユーティリティ
+                formatDate(date) {
+                    if (!date) return '';
+                    return dayjs(date).format('YYYY/MM/DD');
+                },
+                
+                calculateExpectedCompletion(currentPage, totalPages) {
+                    if (currentPage === 0) return null;
+                    
+                    const remainingPages = totalPages - currentPage;
+                    const pagesPerDay = this.dailyPageGoal || 30;
+                    const daysNeeded = Math.ceil(remainingPages / pagesPerDay);
+                    
+                    return new Date(Date.now() + daysNeeded * 24 * 60 * 60 * 1000);
+                },
+                
+                generateReadingSuggestion() {
+                    const suggestions = [
+                        '通勤電車で1章読んでみましょう',
+                        '寝る前の30分、読書タイムにしませんか？',
+                        '昼休みに数ページ進めてみましょう',
+                        'コーヒーブレイクのお供に読書はいかが？',
+                        '朝の静かな時間に読書を楽しみましょう'
+                    ];
+                    
+                    const times = ['15分', '30分', '45分', '1時間'];
+                    
+                    this.readingSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+                    this.suggestedReadingTime = times[Math.floor(Math.random() * times.length)];
+                },
+                
+                initializeBadgesAndChallenges() {
+                    // バッジ
+                    this.earnedBadges = [
+                        { id: 1, name: '読書初心者', icon: '🌱', level: 'bronze' },
+                        { id: 2, name: '月間達成', icon: '🎯', level: 'silver' },
+                        { id: 3, name: '100冊読破', icon: '📚', level: 'gold' }
+                    ];
+                    
+                    // チャレンジ
+                    this.challenges = [
+                        {
+                            id: 1,
+                            name: '週末読書チャレンジ',
+                            description: '週末に1冊完読しよう',
+                            progress: 60,
+                            completed: false
+                        },
+                        {
+                            id: 2,
+                            name: 'ジャンル開拓',
+                            description: '5つの異なるジャンルの本を読もう',
+                            progress: 80,
+                            completed: false
+                        },
+                        {
+                            id: 3,
+                            name: '早起き読書',
+                            description: '朝6時に起きて30分読書を7日間続けよう',
+                            progress: 100,
+                            completed: true
+                        }
+                    ];
+                },
+                
+                // 言語・フォントサイズ変更
+                changeLanguage() {
+                    localStorage.setItem('language', this.language);
+                },
+                
+                changeFontSize() {
+                    document.body.className = `font-${this.fontSize}`;
+                    localStorage.setItem('fontSize', this.fontSize);
+                },
+                
+                // シェア機能
+                shareToX() {
+                    const text = `📚 本の森で読書習慣を育てています！\n今月は${this.monthlyStats.completed}冊完読しました✨\n\n読書ペースを可視化して、積読解消をサポート！\n\n#継続は力なり #読書記録 #本の森`;
+                    const url = 'https://appadaycreator.github.io/book-forest/';
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                },
+                
+                shareToFacebook() {
+                    const url = 'https://appadaycreator.github.io/book-forest/';
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+                },
+                
+                shareToLine() {
+                    const text = `本の森 - 読書進捗トラッカー`;
+                    const url = 'https://appadaycreator.github.io/book-forest/';
+                    window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text + '\n' + url)}`, '_blank');
+                },
+                
+                // デモ表示
+                showDemo() {
+                    this.user = { email: 'demo@example.com' };
+                    this.loadDemoData();
+                }
+            },
+            
+            mounted() {
+                this.init();
+                
+                // PWA Service Worker登録
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

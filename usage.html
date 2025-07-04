@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使い方 - 本の森</title>
+    <meta name="description" content="本の森の使い方を詳しく説明します。読書進捗の管理方法、目標設定、統計機能などの活用方法をご紹介。">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
+    <!-- End Google Tag Manager -->
+    
+    <style>
+        :root {
+            --primary-color: #2d5016;
+            --secondary-color: #4a7c2e;
+            --accent-color: #8bc34a;
+            --light-green: #dcedc8;
+            --text-color: #333;
+            --bg-color: #fafafa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin: 1.5rem 0 0.5rem;
+        }
+        
+        .step {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, var(--light-green), white);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .tip::before {
+            content: "💡 ";
+            font-size: 1.2rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin: 2rem 0;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .back-link:hover {
+            background: var(--secondary-color);
+        }
+        
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin: 0.5rem 0;
+        }
+        
+        .shortcut-key {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: #e0e0e0;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <header class="header">
+        <h1>📚 本の森の使い方</h1>
+        <p>読書習慣を楽しく継続するための完全ガイド</p>
+    </header>
+    
+    <main class="container">
+        <section>
+            <h2>🚀 はじめに</h2>
+            <p>本の森は、読書の進捗を管理し、読書習慣を楽しく継続するためのWebアプリです。積読を解消し、計画的に読書を進めることができます。</p>
+            
+            <div class="feature-card">
+                <h3>主な機能</h3>
+                <ul>
+                    <li>📖 読書進捗の可視化</li>
+                    <li>🎯 月間・年間の読書目標設定</li>
+                    <li>📊 読書統計とグラフ表示</li>
+                    <li>🏆 バッジと称号システム</li>
+                    <li>📱 スマートフォン対応（PWA）</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>📝 基本的な使い方</h2>
+            
+            <div class="step">
+                <h3><span class="step-number">1</span>アカウント登録</h3>
+                <p>メールアドレスとパスワードで簡単に登録できます。Googleアカウントでのログインも可能です。</p>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">2</span>本を追加</h3>
+                <p>「本を追加」ボタンから、読みたい本や読書中の本を登録します。</p>
+                <ul>
+                    <li>タイトル、著者名、総ページ数を入力</li>
+                    <li>ISBNコードで自動入力も可能</li>
+                    <li>ジャンルやタグを設定して整理</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">3</span>読書進捗を更新</h3>
+                <p>読書を進めたら、現在のページ数を更新します。</p>
+                <ul>
+                    <li>進捗率が自動計算されます</li>
+                    <li>完読予想日が表示されます</li>
+                    <li>読書メモや引用を記録できます</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">4</span>統計を確認</h3>
+                <p>読書統計ページで、あなたの読書傾向を分析できます。</p>
+                <ul>
+                    <li>月別の読書冊数グラフ</li>
+                    <li>ジャンル別の割合</li>
+                    <li>平均読書速度</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>🎯 目標設定機能</h2>
+            <p>読書目標を設定して、モチベーションを維持しましょう。</p>
+            
+            <div class="feature-card">
+                <h3>設定できる目標</h3>
+                <ul>
+                    <li><strong>月間読書目標</strong>：月に何冊読むか</li>
+                    <li><strong>年間読書目標</strong>：年間の読書冊数</li>
+                    <li><strong>1日の読書ページ目標</strong>：毎日のペース管理</li>
+                </ul>
+            </div>
+            
+            <div class="tip">
+                目標は現実的に設定しましょう。最初は月2〜3冊から始めて、徐々に増やしていくのがおすすめです。
+            </div>
+        </section>
+        
+        <section>
+            <h2>🏆 バッジと称号</h2>
+            <p>読書の実績に応じて、様々なバッジや称号を獲得できます。</p>
+            
+            <div class="feature-card">
+                <h3>獲得できるバッジの例</h3>
+                <ul>
+                    <li>🌱 読書初心者：初めての本を登録</li>
+                    <li>🎯 月間達成：月間目標を達成</li>
+                    <li>📚 100冊読破：累計100冊を完読</li>
+                    <li>🔥 連続読書：7日連続で読書記録</li>
+                    <li>🌈 ジャンルマスター：5つ以上のジャンルを読破</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>💡 便利な機能</h2>
+            
+            <div class="feature-card">
+                <h3>読書習慣サポート</h3>
+                <ul>
+                    <li>毎日の読書リマインダー</li>
+                    <li>スキマ時間の活用提案</li>
+                    <li>読書時間の最適化アドバイス</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>共有機能</h3>
+                <ul>
+                    <li>読書記録をSNSでシェア</li>
+                    <li>月間レポートの自動生成</li>
+                    <li>友達との読書記録比較</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>カスタマイズ</h3>
+                <ul>
+                    <li>文字サイズの変更（5段階）</li>
+                    <li>日本語/英語の切り替え</li>
+                    <li>ダークモード対応（今後実装予定）</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>⌨️ ショートカットキー</h2>
+            <p>効率的に操作するためのキーボードショートカット：</p>
+            
+            <div class="feature-card">
+                <ul>
+                    <li><span class="shortcut-key">N</span> 新しい本を追加</li>
+                    <li><span class="shortcut-key">S</span> 統計画面へ移動</li>
+                    <li><span class="shortcut-key">G</span> 目標設定画面へ移動</li>
+                    <li><span class="shortcut-key">/</span> 検索（今後実装予定）</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>📱 スマートフォンでの利用</h2>
+            <p>本の森はPWA（Progressive Web App）対応で、スマートフォンでも快適に利用できます。</p>
+            
+            <div class="step">
+                <h3>ホーム画面に追加する方法</h3>
+                <p><strong>iPhone/iPadの場合：</strong></p>
+                <ol>
+                    <li>Safariで本の森を開く</li>
+                    <li>共有ボタンをタップ</li>
+                    <li>「ホーム画面に追加」を選択</li>
+                </ol>
+                <p><strong>Androidの場合：</strong></p>
+                <ol>
+                    <li>Chromeで本の森を開く</li>
+                    <li>メニューから「ホーム画面に追加」を選択</li>
+                </ol>
+            </div>
+        </section>
+        
+        <section>
+            <h2>❓ よくある質問</h2>
+            
+            <div class="feature-card">
+                <h3>Q: データは安全に保存されますか？</h3>
+                <p>A: はい、すべてのデータは暗号化されて安全に保存されます。Supabaseの堅牢なセキュリティシステムを使用しています。</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Q: オフラインでも使えますか？</h3>
+                <p>A: 基本的な機能はオフラインでも利用可能です。オンラインに戻った際に自動的に同期されます。</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Q: 無料で使えますか？</h3>
+                <p>A: はい、すべての機能を無料でご利用いただけます。</p>
+            </div>
+        </section>
+        
+        <a href="index.html" class="back-link">← トップページに戻る</a>
+    </main>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせ - 本の森</title>
+    <meta name="description" content="本の森へのお問い合わせフォームです。ご質問、ご要望、不具合報告などお気軽にお問い合わせください。">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
+    <!-- End Google Tag Manager -->
+    
+    <style>
+        :root {
+            --primary-color: #2d5016;
+            --secondary-color: #4a7c2e;
+            --accent-color: #8bc34a;
+            --text-color: #333;
+            --bg-color: #fafafa;
+            --error-color: #f44336;
+            --success-color: #4caf50;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .required {
+            color: var(--error-color);
+            margin-left: 0.25rem;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-reset {
+            background: #e0e0e0;
+            color: var(--text-color);
+        }
+        
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .success-message {
+            background: #e8f5e9;
+            color: var(--success-color);
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .back-link:hover {
+            background: var(--secondary-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .contact-info {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <header class="header">
+        <h1>お問い合わせ</h1>
+        <p>ご質問・ご要望をお聞かせください</p>
+    </header>
+    
+    <main class="container">
+        <div class="info-box">
+            <p><strong>📢 お問い合わせの前に</strong></p>
+            <p>よくあるご質問は「<a href="usage.html#faq">使い方ページ</a>」をご確認ください。<br>
+            返信には通常2〜3営業日いただいております。</p>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            <h3>✅ 送信完了</h3>
+            <p>お問い合わせを受け付けました。<br>
+            内容を確認の上、ご連絡させていただきます。</p>
+        </div>
+        
+        <form id="contactForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label for="category">
+                    お問い合わせ種別
+                    <span class="required">*</span>
+                </label>
+                <select id="category" name="category" required>
+                    <option value="">選択してください</option>
+                    <option value="usage">使い方について</option>
+                    <option value="bug">不具合報告</option>
+                    <option value="request">機能要望</option>
+                    <option value="account">アカウントについて</option>
+                    <option value="other">その他</option>
+                </select>
+                <span class="error-message" id="categoryError">お問い合わせ種別を選択してください</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">
+                    お名前
+                    <span class="required">*</span>
+                </label>
+                <input type="text" id="name" name="name" required placeholder="山田 太郎">
+                <span class="error-message" id="nameError">お名前を入力してください</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">
+                    メールアドレス
+                    <span class="required">*</span>
+                </label>
+                <input type="email" id="email" name="email" required placeholder="example@email.com">
+                <span class="error-message" id="emailError">有効なメールアドレスを入力してください</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">
+                    件名
+                    <span class="required">*</span>
+                </label>
+                <input type="text" id="subject" name="subject" required placeholder="お問い合わせの件名">
+                <span class="error-message" id="subjectError">件名を入力してください</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">
+                    お問い合わせ内容
+                    <span class="required">*</span>
+                </label>
+                <textarea id="message" name="message" required placeholder="お問い合わせ内容を詳しくご記入ください。&#10;&#10;【不具合報告の場合】&#10;・発生日時&#10;・使用環境（OS、ブラウザ）&#10;・具体的な症状&#10;・再現手順&#10;&#10;などをお知らせください。"></textarea>
+                <span class="error-message" id="messageError">お問い合わせ内容を入力してください</span>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>送信中...</p>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn-submit">送信する</button>
+                <button type="reset" class="btn-reset" onclick="resetForm()">クリア</button>
+            </div>
+        </form>
+        
+        <div class="contact-info">
+            <p>お急ぎの場合は、X（旧Twitter）でもお問い合わせを受け付けております。</p>
+            <p><a href="https://x.com/appadaycreator" target="_blank">@appadaycreator</a></p>
+        </div>
+        
+        <a href="index.html" class="back-link">← トップページに戻る</a>
+    </main>
+    
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // バリデーション
+            let isValid = true;
+            const fields = ['category', 'name', 'email', 'subject', 'message'];
+            
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                const errorElement = document.getElementById(field + 'Error');
+                
+                if (!element.value.trim()) {
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // メールアドレスの形式チェック
+            const emailElement = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (emailElement.value && !emailRegex.test(emailElement.value)) {
+                emailError.textContent = '有効なメールアドレスを入力してください';
+                emailError.style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // 送信処理（実際の実装では、ここでサーバーにデータを送信）
+            const loading = document.getElementById('loading');
+            const form = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+            
+            loading.style.display = 'block';
+            
+            // 実際の実装では、ここでフォームデータをサーバーに送信
+            // 今回はデモのため、タイムアウトで疑似的に処理
+            setTimeout(() => {
+                loading.style.display = 'none';
+                form.style.display = 'none';
+                successMessage.style.display = 'block';
+                
+                // フォームをリセット
+                form.reset();
+                
+                // 3秒後に元に戻す
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    form.style.display = 'block';
+                }, 5000);
+            }, 1500);
+        }
+        
+        function resetForm() {
+            // エラーメッセージを非表示
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => {
+                error.style.display = 'none';
+            });
+        }
+        
+        // カテゴリ選択時に件名を自動設定
+        document.getElementById('category').addEventListener('change', function() {
+            const subjectElement = document.getElementById('subject');
+            const categoryText = this.options[this.selectedIndex].text;
+            
+            if (this.value && !subjectElement.value) {
+                subjectElement.value = categoryText + 'について';
+            }
+        });
+    </script>
+</body>
+</html>
