@@ -1527,12 +1527,16 @@
                         status: this.newBook.status,
                         memo: this.newBook.memo,
                         favorite: this.newBook.favorite,
-                        rating: this.newBook.rating,
                         progress: this.newBook.status === 'completed' ? 100 : 
                                  this.newBook.status === 'reading' ? Math.round((this.newBook.currentPage / this.newBook.totalPages) * 100) : 0,
                         created_at: new Date(),
                         user_id: this.user?.id
                     };
+                    
+                    // ratingは本が完了した時のみ設定
+                    if (this.newBook.status === 'completed' && this.newBook.rating > 0) {
+                        newBook.rating = this.newBook.rating;
+                    }
                     
                     if (this.newBook.status === 'reading') {
                         newBook.expected_completion = this.calculateExpectedCompletion(
@@ -1589,7 +1593,7 @@
                         status: 'wishlist',
                         memo: '',
                         favorite: false,
-                        rating: 0
+                        rating: null
                     };
                 },
                 
