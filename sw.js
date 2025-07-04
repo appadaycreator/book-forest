@@ -1,11 +1,12 @@
 const CACHE_NAME = 'book-forest-v1';
+const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/favicon.ico',
+  BASE_PATH,
+  `${BASE_PATH}index.html`,
+  `${BASE_PATH}manifest.json`,
+  `${BASE_PATH}icon-192.png`,
+  `${BASE_PATH}icon-512.png`,
+  `${BASE_PATH}favicon.ico`,
   'https://unpkg.com/vue@3/dist/vue.global.prod.js', // 本番用Vue
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/chart.js',
@@ -18,6 +19,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
+      .catch(err => console.error('Cache install failed:', err))
   );
 });
 
