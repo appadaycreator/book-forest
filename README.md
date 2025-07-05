@@ -3,3 +3,6 @@
 
 ## 更新内容
 GitHub Pages 上での PWA 動作を安定させるため、Service Worker と manifest.json のパス設定を修正しました。
+
+### 2024-05 更新
+ナビゲーションボタンが反応しない問題を修正しました。

@@ -514,10 +514,10 @@
                 
                 <nav>
                     <ul class="nav-menu">
-                        <li><a href="#" @click="currentView = 'dashboard'">ダッシュボード</a></li>
-                        <li><a href="#" @click="currentView = 'bookshelf'">本棚</a></li>
-                        <li><a href="#" @click="currentView = 'stats'">統計</a></li>
-                        <li><a href="#" @click="currentView = 'goals'">目標</a></li>
+                        <li><a href="#" @click.prevent="currentView = 'dashboard'">ダッシュボード</a></li>
+                        <li><a href="#" @click.prevent="currentView = 'bookshelf'">本棚</a></li>
+                        <li><a href="#" @click.prevent="currentView = 'stats'">統計</a></li>
+                        <li><a href="#" @click.prevent="currentView = 'goals'">目標</a></li>
                         <li>
                             <select v-model="language" @change="changeLanguage" class="form-input" style="width: auto; padding: 0.5rem;">
                                 <option value="ja">日本語</option>
